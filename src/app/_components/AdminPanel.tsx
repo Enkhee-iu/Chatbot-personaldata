@@ -117,7 +117,7 @@ export default function AdminPanel({ onPersonAdded }: AdminPanelProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-2 bg-gray-900 text-white p-3 rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-70 flex justify-center items-center"
+          className="mt-2 cursor-pointer bg-gray-900 text-white p-3 rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-70 flex justify-center items-center"
         >
           {isSubmitting ? (
             <span className="animate-spin mr-2">⟳</span>

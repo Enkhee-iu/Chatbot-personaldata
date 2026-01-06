@@ -84,7 +84,7 @@ export default function Home() {
                 </span>
                 <button 
                   onClick={fetchPeople}
-                  className="p-1  rounded-full transition-colors"
+                  className="p-1 cursor-pointer  rounded-full transition-colors"
                   title="Шинэчлэх"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,7 +117,7 @@ export default function Home() {
 
                         <button 
                           onClick={() => handleDelete(p.id)}
-                          className="text-red-500 hover:bg-red-50 p-2 rounded-md transition-colors border border-transparent hover:border-red-100"
+                          className="text-red-500 cursor-pointer hover:bg-red-50 p-2 rounded-md transition-colors border border-transparent hover:border-red-100"
                           title="Устгах"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
