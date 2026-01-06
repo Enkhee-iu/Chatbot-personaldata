@@ -13,14 +13,39 @@ export default function ChatBot() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Load messages from localStorage on mount
+  useEffect(() => {
+    const savedMessages = localStorage.getItem("chatMessages");
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+      } catch (e) {
+        console.error("Failed to parse chat messages", e);
+      }
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem("chatMessages", JSON.stringify(messages));
+    }
+    scrollToBottom();
+  }, [messages, isInitialized]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const clearHistory = () => {
+    if (confirm("Чатны түүхийг устгахдаа итгэлтэй байна уу?")) {
+      setMessages([]);
+      localStorage.removeItem("chatMessages");
+    }
+  };
 
   // 3. 'e' параметрт React.FormEvent төрлийг заана
   const sendMessage = async (e: React.FormEvent) => {
@@ -66,11 +91,23 @@ export default function ChatBot() {
     }
   };
 
+  if (!isInitialized) return null; // Avoid hydration mismatch
+
   return (
     <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="p-4 border-b bg-gray-50">
-        <h2 className="font-semibold text-lg text-gray-800">AI Туслах</h2>
-        <p className="text-xs text-gray-500">Байгууллагын мэдээлэлд суурилсан чатбот</p>
+      <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
+        <div>
+          <h2 className="font-semibold text-lg text-gray-800">AI Туслах</h2>
+          <p className="text-xs text-gray-500">Байгууллагын мэдээлэлд суурилсан чатбот</p>
+        </div>
+        {messages.length > 0 && (
+          <button 
+            onClick={clearHistory}
+            className="text-xs text-red-500 hover:text-red-700 px-2 py-1 rounded border border-transparent hover:border-red-200 transition-colors"
+          >
+            Түүх цэвэрлэх
+          </button>
+        )}
       </div>
 
       {/* Чатны хэсэг */}

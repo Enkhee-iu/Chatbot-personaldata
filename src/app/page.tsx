@@ -1,15 +1,45 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminPanel from "@/components/AdminPanel";
 import ChatBot from "@/components/ChatBot";
 
 export default function Home() {
   const [addedPeople, setAddedPeople] = useState<any[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Load added people from localStorage on mount
+  useEffect(() => {
+    const savedPeople = localStorage.getItem("addedPeople");
+    if (savedPeople) {
+      try {
+        setAddedPeople(JSON.parse(savedPeople));
+      } catch (e) {
+        console.error("Failed to parse added people", e);
+      }
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Save added people to localStorage whenever the list changes
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem("addedPeople", JSON.stringify(addedPeople));
+    }
+  }, [addedPeople, isInitialized]);
 
   const handlePersonAdded = (person: any) => {
     // Шинээр нэмэгдсэн хүнийг жагсаалтын хамгийн дээр гаргах
     setAddedPeople((prev) => [person, ...prev]);
   };
+
+  const clearPeopleHistory = () => {
+    if (confirm("Бүртгэлийн түүхийг цэвэрлэхдээ итгэлтэй байна уу?")) {
+      setAddedPeople([]);
+      localStorage.removeItem("addedPeople");
+    }
+  };
+
+  if (!isInitialized) return null; // Avoid hydration mismatch
 
   return (
     <main className="min-h-screen bg-gray-100 p-4 md:p-6">
@@ -25,9 +55,20 @@ export default function Home() {
           <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
             <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
               <h3 className="font-semibold text-gray-800">Бүртгэл</h3>
-              <span className="text-xs bg-gray-200 px-2 py-1 rounded-full text-gray-600">
-                {addedPeople.length}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-gray-200 px-2 py-1 rounded-full text-gray-600">
+                  {addedPeople.length}
+                </span>
+                {addedPeople.length > 0 && (
+                  <button 
+                    onClick={clearPeopleHistory}
+                    className="text-xs text-red-500 hover:text-red-700"
+                    title="Түүх цэвэрлэх"
+                  >
+                    🗑️
+                  </button>
+                )}
+              </div>
             </div>
             
             <div className="overflow-y-auto p-2 flex-1">
