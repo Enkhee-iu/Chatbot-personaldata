@@ -152,7 +152,7 @@ export default function ChatBot() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Асуултаа бичнэ үү..."
-            className="flex-1 border border-gray-300 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="flex-1 border border-gray-300 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 font-medium placeholder:text-gray-400"
           />
           <button
             type="submit"

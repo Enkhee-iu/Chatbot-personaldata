@@ -67,7 +67,7 @@ export default function AdminPanel({ onPersonAdded }: AdminPanelProps) {
               value={form.lastName}
               placeholder="Болд"
               onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-              className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 font-medium placeholder:text-gray-400"
               required
             />
           </div>
@@ -77,7 +77,7 @@ export default function AdminPanel({ onPersonAdded }: AdminPanelProps) {
               value={form.firstName}
               placeholder="Дорж"
               onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-              className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 font-medium placeholder:text-gray-400"
               required
             />
           </div>
@@ -89,7 +89,7 @@ export default function AdminPanel({ onPersonAdded }: AdminPanelProps) {
             value={form.registerId}
             placeholder="УБ90010101"
             onChange={(e) => setForm({ ...form, registerId: e.target.value })}
-            className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 font-medium placeholder:text-gray-400"
             required
           />
         </div>
@@ -100,7 +100,7 @@ export default function AdminPanel({ onPersonAdded }: AdminPanelProps) {
             value={form.phone}
             placeholder="99119911"
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 font-medium placeholder:text-gray-400"
           />
         </div>
 
@@ -110,7 +110,7 @@ export default function AdminPanel({ onPersonAdded }: AdminPanelProps) {
             value={form.Address}
             placeholder="ХУД, 11-р хороо..."
             onChange={(e) => setForm({ ...form, Address: e.target.value })}
-            className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 font-medium placeholder:text-gray-400"
           />
         </div>
 

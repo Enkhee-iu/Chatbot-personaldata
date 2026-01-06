@@ -116,7 +116,7 @@ export default function Home() {
               ) : people.length === 0 ? (
                 <div className="p-4 text-center text-gray-400">Мэдээлэл алга</div>
               ) : (
-                <div className="space-y-2 opacity-70">
+                <div className="space-y-2">
                   {/* Show only first 5 items in preview */}
                   {people.slice(0, 5).map((p, i) => (
                     <div key={p.id || i} className="p-3 border rounded-lg bg-gray-50">
