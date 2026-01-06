@@ -10,7 +10,7 @@ export default function AdminPage() {
     Address: "", // Хаяг нэмэгдсэн
   });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // САЙЖРУУЛАЛТ: Хаягийг текст рүү нэмлээ. Ингэж байж AI хаягийг мэднэ.
