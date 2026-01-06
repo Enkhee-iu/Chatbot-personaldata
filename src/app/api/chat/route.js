@@ -1,62 +1,64 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Pinecone } from '@pinecone-database/pinecone';
+import { HfInference } from "@huggingface/inference";
+import { Pinecone } from "@pinecone-database/pinecone";
+
+const hf = new HfInference(process.env.HF_TOKEN);
 
 export async function POST(req) {
   try {
     const { messages } = await req.json();
     const lastMessage = messages[messages.length - 1].content;
 
-    // API Key-үүдийг шалгах
-    if (!process.env.GEMINI_API_KEY || !process.env.PINECONE_API_KEY) {
-      throw new Error("API Key дутуу байна. .env.local файлыг шалгана уу.");
-    }
-
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
     const index = pc.index(process.env.PINECONE_INDEX);
 
-    // 1. Асуултыг вектор болгох (Embedding)
-    const embedModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
-    const embedResult = await embedModel.embedContent(lastMessage);
-    const queryVector = embedResult.embedding.values;
+    // 1. Асуултыг вектор болгох (Хэвээрээ)
+    const queryVector = await hf.featureExtraction({
+      model: "BAAI/bge-small-en-v1.5",
+      inputs: lastMessage,
+    });
 
-    // 2. Pinecone-оос хайх
+    // 2. САЙЖРУУЛАЛТ: Pinecone-оос илүү их мэдээлэл хайх (topK: 10)
     const queryResponse = await index.query({
       vector: queryVector,
-      topK: 3,
+      topK: 10, // 3 байсныг 10 болгосноор AI илүү их баримт уншина
       includeMetadata: true,
     });
 
-    // 3. Контекст бэлдэх
-    const context = queryResponse.matches && queryResponse.matches.length > 0
-      ? queryResponse.matches.map(match => `Өгөгдөл: ${match.metadata.allInfo}`).join("\n\n")
-      : "Тохирох мэдээлэл олдсонгүй.";
+    const context =
+      queryResponse.matches && queryResponse.matches.length > 0
+        ? queryResponse.matches
+            .map((match) => match.metadata.text)
+            .join("\n---\n")
+        : "Мэдээлэл олдсонгүй.";
 
-    // 4. Gemini-ээр хариулт үүсгэх
-    // Энд "gemini-1.5-flash" гэж бичих нь хамгийн стандарт юм. 
-    // Хэрэв дахиад 404 гарвал "gemini-pro" болгож солиорой.
-    const chatModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
-    const prompt = `Чи бол байгууллагын туслах чатбот. 
-    Доорх мэдээлэлд үндэслэн асуултанд хариул.
-    
-    Контекст:
-    ${context}
-    
-    Асуулт: ${lastMessage}`;
+    // 3. САЙЖРУУЛАЛТ: Хамгийн хүчирхэг моделыг ашиглах (Qwen 72B)
+    const chatResponse = await hf.chatCompletion({
+      model: "Qwen/Qwen2.5-72B-Instruct", // Энэ модел Llama-3.2-оос 20 дахин том тархитай
+      messages: [
+        {
+          role: "system",
+          content: `Чи бол Монгол улсын байгууллагын ахлах зөвлөх, ухаалаг туслах байна. 
+          Өгөгдсөн "Контекст" мэдээллийг маш сайн шинжилж, хэрэглэгчийн асуултад маш тодорхой, 
+          дэлгэрэнгүй, логик дараалалтай хариул. 
+          
+          Дүрмийн бус ярианаас зайлсхийж, мэргэжлийн түвшинд хариулна уу.
+          
+          Контекст:
+          ${context}`,
+        },
+        { role: "user", content: lastMessage },
+      ],
+      max_tokens: 1000, // Хариултын уртыг нэмэгдүүлэх
+      temperature: 0.2, // Бага байх тусам илүү нухацтай, баримтад тулгуурлаж хариулна
+    });
 
-    const result = await chatModel.generateContent(prompt);
-    
-    // Хариултыг аюулгүй авах
-    const response = await result.response;
-    const text = response.text();
-
-    return Response.json({ message: text });
-
+    const aiMessage = chatResponse.choices[0].message.content;
+    return Response.json({ message: aiMessage });
   } catch (error) {
-    console.error("DETAILED ERROR:", error);
-    return Response.json({ 
-      message: "Алдаа гарлаа: " + error.message 
-    }, { status: 500 });
+    console.error("ERROR:", error);
+    return Response.json(
+      { message: "Алдаа: " + error.message },
+      { status: 500 }
+    );
   }
 }
